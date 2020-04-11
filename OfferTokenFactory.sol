@@ -932,14 +932,13 @@ contract OfferToken is LexDAORole, PayableOwnable, ERC20Burnable, ERC20Capped {
     }
 }
 
-contract OfferTokenFactory {
+contract OfferTokenFactory is PayableOwnable {
     // presented by OpenESQ || lexDAO LLC ~ Use at own risk!
     uint8 public version = 2;
     
     // factory settings
     string public stamp;
     uint256 public factoryFee;
-    address payable public manager;
     address payable public _lexDAO; 
     
     OfferToken private OT;
@@ -950,12 +949,11 @@ contract OfferTokenFactory {
     event LexDAOPaid(uint256 indexed payment, string indexed details);
     event LexDAOTransferred(address indexed newLexDAO);
     
-    constructor (string memory _stamp, uint256 _factoryFee, address payable _manager, address payable lexDAO) public 
-	{
+    constructor (string memory _stamp, uint256 _factoryFee, address payable _owner, address payable lexDAO) public { 
+	    _lexDAO = lexDAO;
+	    factoryFee = _factoryFee;
         stamp = _stamp;
-        factoryFee = _factoryFee;
-        manager = _manager;
-        _lexDAO = lexDAO;
+        _transferOwnership(_owner);
 	}
     
     function newOfferToken(
@@ -985,7 +983,7 @@ contract OfferTokenFactory {
         
         tokens.push(address(OT));
         
-        address(manager).transfer(msg.value);
+        address(_owner).transfer(msg.value);
         
         emit Deployed(address(OT), _offeror);
     }
@@ -1014,13 +1012,7 @@ contract OfferTokenFactory {
     /***************
     MGMT FUNCTIONS
     ***************/
-    function newFactoryFee(uint256 weiAmount) public {
-        require(msg.sender == manager);
+    function newFactoryFee(uint256 weiAmount) public onlyOwner {
         factoryFee = weiAmount;
-    }
-    
-    function transferManager(address payable newManager) public {
-        require(msg.sender == manager);
-        manager = newManager;
     }
 }
