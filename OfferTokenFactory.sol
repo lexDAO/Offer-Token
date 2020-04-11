@@ -994,17 +994,9 @@ contract OfferTokenFactory {
         return tokens.length;
     }
     
-    // factory manager functions
-    function newFactoryFee(uint256 weiAmount) public {
-        require(msg.sender == manager);
-        factoryFee = weiAmount;
-    }
-    
-    function transferManager(address payable newManager) public {
-        require(msg.sender == manager);
-        manager = newManager;
-    }
-    
+    /***************
+    LEXDAO FUNCTIONS
+    ***************/
     // lexDAO functions
     function payLexDAO(string memory details) public payable { 
         _lexDAO.transfer(msg.value);
@@ -1017,5 +1009,18 @@ contract OfferTokenFactory {
         _lexDAO = newLexDAO;
         
         emit LexDAOTransferred(newLexDAO);
+    }
+    
+    /***************
+    MGMT FUNCTIONS
+    ***************/
+    function newFactoryFee(uint256 weiAmount) public {
+        require(msg.sender == manager);
+        factoryFee = weiAmount;
+    }
+    
+    function transferManager(address payable newManager) public {
+        require(msg.sender == manager);
+        manager = newManager;
     }
 }
